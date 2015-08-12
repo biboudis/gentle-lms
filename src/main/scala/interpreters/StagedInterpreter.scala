@@ -27,18 +27,14 @@ case class Declaration(name: String, param: String, body: Exp) extends Def
 abstract class Prog
 case class Program(defs: List[Declaration], body: Exp) extends Prog
 
-trait StagedInterpreter extends IfThenElse
-    with BooleanOps with Variables with OrderingOps with PrimitiveOps
-    with LiftVariables with LiftBoolean with LiftPrimitives with ArrayOps
-    with ArrayBufferOps with While with NumericOps
-    with Equal with LiftString with StringOps {   }
+class YikesEx(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
 
-object StagedInterpreter {
-  class YikesEx(message: String = null, cause: Throwable = null) extends RuntimeException(message, cause)
-
+object BasicInterpreter {
   def env0[A, B] : (A => B) = (x : A) => throw new YikesEx()
 
   def fenv0[A, B] : (A => B) = env0
+
+  def extend [A, B](env : (A => B), x : A, v : B) = (y : A) => if(x == y) v else env(y)
 
   def eval1(e : Exp, env: (String => Int), fenv: (String => (Int  => Int))) : Int = {
     e match {
@@ -57,17 +53,51 @@ object StagedInterpreter {
     }
   }
 
-  // How to simulate higher-rank polymorphism in Scala?
-  def extend [A, B](env  : (A => B       ), x : A, v : B       ) = (y : A) => if(x == y) v else env(y)
-  def extendf[A, B](fenv : (A => (B => B)), x : A, v : (B => B)) = (y : A) => if(x == y) v else fenv(y)
-
   def peval1(p: Prog, env : (String => Int), fenv: (String => (Int => Int))) : Int = {
     p match {
       case Program(Nil, e) => eval1(e, env, fenv)
       case Program(Declaration(name, param, e1)::defs, e) => {
-        def f(x : Int) : Int = eval1(e1, extend(env, param, x), extendf(fenv, name, f))
+        def f(x : Int) : Int = eval1(e1, extend(env, param, x), extend(fenv, name, f))
         peval1(Program(defs, e), env, extend(fenv, name, f))
       }
     }
   }
 }
+
+trait StagedInterpreter extends IfThenElse
+    with BooleanOps with Variables with OrderingOps with PrimitiveOps
+    with LiftVariables with LiftBoolean with LiftPrimitives with ArrayOps
+    with ArrayBufferOps with While with NumericOps
+    with Equal with LiftString with StringOps with Functions {
+
+  def extend[A, B](env : (A => Rep[B]), x : A, v : Rep[B]) = (y : A) => if(x == y) v else env(y)
+
+  // the simple interpreter staged
+  def eval2(e : Exp, env: (String => Rep[Int]), fenv: (String => Rep[Int=>Int])) : Rep[Int] = {
+    e match {
+      case IntVal(i) => i
+      case Variable(s) => env(s)
+      case App(s, e2) => fenv(s)(eval2(e2, env, fenv))
+      case Add(e1, e2) => eval2(e1, env, fenv) + eval2(e2, env, fenv)
+      case Div(e1, e2) => eval2(e1, env, fenv) + eval2(e2, env, fenv)
+      case Mul(e1, e2) => eval2(e1, env, fenv) + eval2(e2, env, fenv)
+      case Sub(e1, e2) => eval2(e1, env, fenv) + eval2(e2, env, fenv)
+      case Ifz(e1,e2,e3) =>
+        if (eval2(e1, env, fenv)==0)
+          eval2(e2, env, fenv)
+        else
+          eval2(e3, env, fenv)
+    }
+  }
+
+  def peval2(p: Prog, env : (String => Rep[Int]), fenv: (String => Rep[Int => Int])) : Rep[Int] = {
+    p match {
+      case Program(Nil, e) => eval2(e, env, fenv)
+      case Program(Declaration(name, param, e1)::defs, e) => {
+        def f(x : Rep[Int]) : Rep[Int] = eval2(e1, extend(env, param, x), extend(fenv, name, f))
+        peval2(Program(defs, e), env, extend(fenv, name, f))
+      }
+    }
+  }
+}
+
