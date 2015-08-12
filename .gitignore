@@ -1,3 +1,6 @@
+# Created by https://www.gitignore.io
+
+### Scala ###
 *.class
 *.log
 
@@ -15,3 +18,16 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+
+
+### SBT ###
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+target/
+lib_managed/
+src_managed/
+project/boot/
+.history
+.cache
+
