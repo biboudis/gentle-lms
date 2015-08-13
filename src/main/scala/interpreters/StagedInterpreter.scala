@@ -64,6 +64,7 @@ object BasicInterpreter {
   }
 }
 
+object StagedInterpreter {}
 trait StagedInterpreter extends IfThenElse
     with BooleanOps with Variables with OrderingOps with PrimitiveOps
     with LiftVariables with LiftBoolean with LiftPrimitives with ArrayOps
@@ -94,8 +95,8 @@ trait StagedInterpreter extends IfThenElse
     p match {
       case Program(Nil, e) => eval2(e, env, fenv)
       case Program(Declaration(name, param, e1)::defs, e) => {
-        def f(x : Rep[Int]) : Rep[Int] = eval2(e1, extend(env, param, x), extend(fenv, name, f))
-        peval2(Program(defs, e), env, extend(fenv, name, f))
+        def f(x : Rep[Int]) : Rep[Int] = eval2(e1, extend(env, param, x), extend(fenv, name, fun(f)))
+        peval2(Program(defs, e), env, extend(fenv, name, fun(f)))
       }
     }
   }
