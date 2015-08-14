@@ -1,4 +1,4 @@
-name := "scala-streams"
+name := "gentle-lms"
 
 version := "1.0"
 
@@ -9,12 +9,16 @@ scalaOrganization := "org.scala-lang.virtualized"
 resolvers ++= Seq(Resolver.sonatypeRepo("releases"), 
 		  Resolver.sonatypeRepo("snapshots"))
 
-libraryDependencies ++= Seq(
-  "org.scalacheck" %% "scalacheck" % "1.12.4" % "test",
-  "org.scala-lang" % "scala-reflect" % "2.11.4",
-  "EPFL" %% "lms" % "0.3-SNAPSHOT"
-)
+libraryDependencies += "org.scala-lang.lms" %% "lms-core" % "0.9.1-SNAPSHOT"
 
-scalacOptions ++= Seq("-Yvirtualize", "-feature", "-deprecation")
+libraryDependencies += "org.scala-lang.virtualized" % "scala-compiler" % "2.11.2"
 
-testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "100", "-workers", "2", "-verbosity", "1")
+libraryDependencies += "org.scala-lang.virtualized" % "scala-library" % "2.11.2"
+
+libraryDependencies += "org.scala-lang.virtualized" % "scala-reflect" % "2.11.2"
+
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.2"
+
+scalacOptions += "-Yvirtualize"
+
+scalacOptions += "-deprecation"

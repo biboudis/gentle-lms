@@ -3,7 +3,7 @@ package interpreters
 import scala.reflect.Manifest
 import scala.Array
 import scala.language.higherKinds
-import scala.virtualization.lms.common._
+import scala.lms.common._
 
 // type exp = Int of int | Var of string | App of string * exp
 //    | Add of exp * exp | Sub of exp * exp

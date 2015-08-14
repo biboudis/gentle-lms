@@ -2,8 +2,8 @@ import lms._
 import interpreters._
 import org.scalatest._
 
-import scala.virtualization.lms.common._
-import scala.virtualization.lms.internal._
+import scala.lms.common._
+import scala.lms.internal._
 import scala.language.reflectiveCalls
 import java.io.PrintWriter
 

@@ -1,6 +1,6 @@
 package lms
 
-import scala.virtualization.lms.internal._
+import scala.lms.internal._
 import java.io._
 
 import scala.tools.nsc._
@@ -8,7 +8,7 @@ import scala.tools.nsc.util._
 import scala.tools.nsc.reporters._
 import scala.tools.nsc.io._
 
-import scala.tools.nsc.util.AbstractFileClassLoader
+import scala.reflect.internal.util.AbstractFileClassLoader
 
 // Copied from https://github.com/manojo/staged-fold-fusion/ to use the
 // multiparameter variants of compile and emit.
@@ -36,7 +36,7 @@ trait MyScalaCompile extends ScalaCompile {
     val parent = this.getClass.getClassLoader
     val loader = new AbstractFileClassLoader(fileSystem, this.getClass.getClassLoader)
     val cls: Class[_] = loader.loadClass(className)
-    val cons = cls.getConstructor(staticData.map(_._1.tp.erasure): _*)
+    val cons = cls.getConstructor(staticData.map(_._1.tp.runtimeClass): _*)
     cons.newInstance(staticData.map(_._2.asInstanceOf[AnyRef]): _*)
   }
 
