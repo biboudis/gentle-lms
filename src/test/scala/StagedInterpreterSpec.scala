@@ -35,7 +35,7 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
       with EqualExpOpt
       with StringOpsExp
       with ArrayBufferOpsExp
-      with FunctionsExp
+      with FunctionsRecursiveExp
       with MyScalaCompile { self =>
     val codegen = new ScalaGenEffect
         with ScalaGenPrimitiveOps
@@ -76,6 +76,6 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
   }
 
   "Staged factorial" should "be unwrapped." in {
-    staged.pevalFactTest(5) should be (120)
+    staged.pevalFactTest(1) should be (120)
   }
 }
