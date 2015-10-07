@@ -13,10 +13,13 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
   import interpreters.StagedInterpreter._
 
   trait StagedInterpreterTests extends StagedInterpreter {
-    val add  = Program(Nil, Add(IntVal(1), IntVal(2)))
+    val add  = Program(Nil,
+      Add(IntVal(1), IntVal(2)))
 
-    val fact = Program(List(Declaration("fact","x", Ifz(Variable("x"),
-      IntVal(1), Mul(Variable("x"), App("fact", Sub(Variable("x"), IntVal(1))))))),
+    val fact = Program(List(Declaration("fact","x",
+      Ifz(Variable("x"),
+        IntVal(1),
+        Mul(Variable("x"), App("fact", Sub(Variable("x"), IntVal(1))))))),
       App ("fact", IntVal(5)))
 
     def pevalAddTest  : Rep[Unit] => Rep[Int] = (_ : Rep[Unit]) => peval2(add, env0, fenv0)
