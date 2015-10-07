@@ -19,8 +19,8 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
       IntVal(1), Mul(Variable("x"), App("fact", Sub(Variable("x"), IntVal(1))))))),
       App ("fact", IntVal(5)))
 
-    def pevalAddTest(test : Rep[Int]) : Rep[Int] = peval2(add, env0, fenv0)
-    def pevalFactTest(test : Rep[Int]) : Rep[Int] = peval2(fact, env0, fenv0)
+    def pevalAddTest  : Rep[Unit] => Rep[Int] = (_ : Rep[Unit]) => peval2(add, env0, fenv0)
+    def pevalFactTest : Rep[Unit] => Rep[Int] = (_ : Rep[Unit]) => peval2(fact, env0, fenv0)
   }
 
   val staged = new StagedInterpreterTests
@@ -54,13 +54,12 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
     codegen.emitSource(self.pevalAddTest, "pevalAddTest", new PrintWriter(System.out))
     codegen.reset
 
-    val pevalAddTest : (Int => Int) = compile(self.pevalAddTest)
+    val pevalAddTestC = compile(self.pevalAddTest)
 
     codegen.emitSource(self.pevalFactTest, "pevalFactTest", new PrintWriter(System.out))
     codegen.reset
 
-    val pevalFactTest : (Int => Int) = compile(self.pevalFactTest)
-
+    val pevalFactTestC = compile(self.pevalFactTest)
   }
 
   "Addition" should "evaluate dynamically." in {
@@ -68,7 +67,7 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
   }
 
   "Staged addition" should "evaluate at compile-time to a constant." in {
-    staged.pevalAddTest(1) should be (3)
+    staged.pevalAddTestC() should be (3)
   }
 
   "Factorial" should "evaluate dynamically." in {
@@ -76,6 +75,6 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
   }
 
   "Staged factorial" should "be unwrapped." in {
-    staged.pevalFactTest(1) should be (120)
+    staged.pevalFactTestC should be (120)
   }
 }

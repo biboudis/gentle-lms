@@ -95,10 +95,10 @@ trait StagedInterpreter extends IfThenElse
     p match {
       case Program(Nil, e) => eval2(e, env, fenv)
       case Program(Declaration(s1, s2, e1)::t1, e) => {
-        def f (x : Rep[Int]) : Rep[Int] = eval2(e1,
-          extend(env, s2, x),
-          extend(fenv, s1, fun(f)))
-        peval2(Program(t1, e), env, extend(fenv, s1, fun(f)))
+        def f: Rep[Int => Int] = fun { x: Rep[Int] =>
+          eval2(e1, extend(env, s2, x), extend(fenv, s1, f))
+	}
+        peval2(Program(t1, e), env, extend(fenv, s1, f))
       }
     }
   }
