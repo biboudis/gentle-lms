@@ -55,13 +55,9 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
         with ScalaGenVariables { val IR: self.type = self }
 
     codegen.emitSource(self.pevalAddTest, "pevalAddTest", new PrintWriter(System.out))
-    codegen.reset
-
     val pevalAddTestC = compile(self.pevalAddTest)
 
     codegen.emitSource(self.pevalFactTest, "pevalFactTest", new PrintWriter(System.out))
-    codegen.reset
-
     val pevalFactTestC = compile(self.pevalFactTest)
   }
 
@@ -78,6 +74,6 @@ class StagedInterpreterSpec extends FlatSpec with Matchers {
   }
 
   "Staged factorial" should "be unwrapped." in {
-    staged.pevalFactTestC should be (120)
+    staged.pevalFactTestC() should be (120)
   }
 }
